@@ -53,4 +53,7 @@ dependencies {
     // OkHttp (Penting untuk Interceptor dan log)
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+    // CircleImageView (Untuk Foto Profil Bulat)
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 }

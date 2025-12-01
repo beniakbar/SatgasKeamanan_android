@@ -40,6 +40,16 @@
             android:inputType="textEmailAddress"
             android:minHeight="48dp" />
 
+        <!-- Input Phone Number (NEW) -->
+        <EditText
+            android:id="@+id/et_reg_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="No. Telepon"
+            android:inputType="phone"
+            android:minHeight="48dp" />
+
         <!-- Input Password -->
         <EditText
             android:id="@+id/et_reg_password"

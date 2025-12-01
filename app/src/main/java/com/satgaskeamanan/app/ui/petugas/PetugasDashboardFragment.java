@@ -14,17 +14,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.satgaskeamanan.app.LoginActivity;
 import com.satgaskeamanan.app.PresensiActivity;
-import com.satgaskeamanan.app.LaporanActivity; // Uncommented this line
+import com.satgaskeamanan.app.LaporanActivity;
 import com.satgaskeamanan.app.R;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class PetugasDashboardFragment extends Fragment {
 
-    private CardView cardPresensi, cardLaporan;
+    private CardView cardPresensi, cardLaporan, cardProfile; // Tambahkan cardProfile
     private Button btnLogout;
     private TextView tvWelcome;
 
@@ -41,6 +42,7 @@ public class PetugasDashboardFragment extends Fragment {
         // Initialize Views
         cardPresensi = view.findViewById(R.id.card_presensi);
         cardLaporan = view.findViewById(R.id.card_laporan);
+        cardProfile = view.findViewById(R.id.card_profile); // Inisialisasi
         btnLogout = view.findViewById(R.id.btn_logout_petugas);
         tvWelcome = view.findViewById(R.id.tv_welcome_petugas);
 
@@ -56,7 +58,20 @@ public class PetugasDashboardFragment extends Fragment {
             startActivity(intent);
         });
 
-        // --- 3. ACTION: Logout ---
+        // --- 3. ACTION: Go to Profile (NEW) ---
+        cardProfile.setOnClickListener(v -> {
+            // Navigasi ke ProfileFragment
+            if (getActivity() != null) {
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, new ProfileFragment())
+                        .addToBackStack(null)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .commit();
+            }
+        });
+
+        // --- 4. ACTION: Logout ---
         btnLogout.setOnClickListener(v -> {
             // Clear SharedPreferences (Token)
             SharedPreferences settings = getActivity().getSharedPreferences("SatgasPrefs", MODE_PRIVATE);

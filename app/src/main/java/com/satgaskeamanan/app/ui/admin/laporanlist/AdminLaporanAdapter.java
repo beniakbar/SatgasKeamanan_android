@@ -16,11 +16,18 @@ import java.util.List;
 public class AdminLaporanAdapter extends RecyclerView.Adapter<AdminLaporanAdapter.LaporanViewHolder> {
 
     private List<AdminLaporanModel> laporanList;
-    private OnStatusChangeListener listener;
+    private OnStatusChangeListener statusListener;
+    private OnItemClickListener itemClickListener;
 
-    public AdminLaporanAdapter(List<AdminLaporanModel> laporanList, OnStatusChangeListener listener) {
+    // Interface untuk menangani klik item (detail)
+    public interface OnItemClickListener {
+        void onItemClick(AdminLaporanModel laporan);
+    }
+
+    public AdminLaporanAdapter(List<AdminLaporanModel> laporanList, OnStatusChangeListener statusListener, OnItemClickListener itemClickListener) {
         this.laporanList = laporanList;
-        this.listener = listener;
+        this.statusListener = statusListener;
+        this.itemClickListener = itemClickListener;
     }
 
     @NonNull
@@ -33,20 +40,37 @@ public class AdminLaporanAdapter extends RecyclerView.Adapter<AdminLaporanAdapte
     @Override
     public void onBindViewHolder(@NonNull LaporanViewHolder holder, int position) {
         AdminLaporanModel laporan = laporanList.get(position);
+        String status = laporan.getStatus();
 
         holder.tvPetugasName.setText(laporan.getPetugasName());
         holder.tvNote.setText(laporan.getNote());
-        holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.status_format, laporan.getStatus()));
+        
+        // Menampilkan Status (UpperCase)
+        holder.tvStatus.setText("Status: " + (status != null ? status.toUpperCase() : "-"));
 
-        // Logika Tombol Aksi (Misal: Tombol untuk menutup laporan)
-        if ("open".equals(laporan.getStatus()) || "in_progress".equals(laporan.getStatus())) {
+        holder.itemView.setOnClickListener(v -> {
+            if (itemClickListener != null) {
+                itemClickListener.onItemClick(laporan);
+            }
+        });
+
+        // LOGIKA UPDATE STATUS (Workflow: LAPOR -> DITANGGAPI -> SELESAI)
+        if ("lapor".equalsIgnoreCase(status)) {
             holder.btnAksi.setVisibility(View.VISIBLE);
-            holder.btnAksi.setText(R.string.tutup_laporan);
+            holder.btnAksi.setText("Tanggapi");
             holder.btnAksi.setOnClickListener(v -> {
-                // Panggil listener di Fragment untuk menjalankan PATCH request
-                listener.onStatusUpdateClicked(laporan.getId(), "closed");
+                if (statusListener != null) statusListener.onStatusUpdateClicked(laporan.getId(), "ditanggapi");
             });
-        } else {
+        } 
+        else if ("ditanggapi".equalsIgnoreCase(status)) {
+            holder.btnAksi.setVisibility(View.VISIBLE);
+            holder.btnAksi.setText("Selesai");
+            holder.btnAksi.setOnClickListener(v -> {
+                if (statusListener != null) statusListener.onStatusUpdateClicked(laporan.getId(), "selesai");
+            });
+        } 
+        else {
+            // Jika sudah 'selesai' atau status tidak dikenal
             holder.btnAksi.setVisibility(View.GONE);
         }
     }
@@ -56,7 +80,6 @@ public class AdminLaporanAdapter extends RecyclerView.Adapter<AdminLaporanAdapte
         return laporanList.size();
     }
 
-    // Metode untuk memperbarui data setelah PATCH berhasil
     public void updateLaporan(AdminLaporanModel updatedLaporan) {
         for (int i = 0; i < laporanList.size(); i++) {
             if (laporanList.get(i).getId() == updatedLaporan.getId()) {
@@ -67,10 +90,9 @@ public class AdminLaporanAdapter extends RecyclerView.Adapter<AdminLaporanAdapte
         }
     }
 
-    // ViewHolder (inner class)
     public static class LaporanViewHolder extends RecyclerView.ViewHolder {
         TextView tvPetugasName, tvNote, tvStatus;
-        Button btnAksi; // Tombol untuk mengubah status
+        Button btnAksi;
 
         public LaporanViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:columnCount="2"
-            android:rowCount="1"
+            android:rowCount="2"
             android:alignmentMode="alignMargins"
             android:columnOrderPreserved="false">
 
@@ -61,7 +61,6 @@
                     android:gravity="center"
                     android:padding="24dp">
 
-                    <!-- You can replace this with @drawable/ic_camera or similar -->
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
@@ -108,7 +107,6 @@
                     android:gravity="center"
                     android:padding="24dp">
 
-                    <!-- You can replace this with @drawable/ic_input_add or similar -->
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
@@ -128,6 +126,52 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Lapor Kejadian"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:layout_marginTop="4dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- CARD 3: PROFIL (Profile) - NEW -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_profile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="24dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@android:drawable/ic_menu_myplaces"
+                        app:tint="?attr/colorPrimary"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Profil Saya"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Edit Data Diri"
                         android:textSize="12sp"
                         android:gravity="center"
                         android:layout_marginTop="4dp"/>

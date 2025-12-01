@@ -4,6 +4,7 @@ import com.satgaskeamanan.app.models.TokenResponse;
 import com.satgaskeamanan.app.models.PetugasModel;
 import com.satgaskeamanan.app.models.AdminLaporanModel;
 import com.satgaskeamanan.app.models.HarianPresensiReportModel;
+import com.satgaskeamanan.app.models.DashboardStatsModel; 
 import com.satgaskeamanan.app.models.UserModel;
 import com.satgaskeamanan.app.models.LoginRequest;
 import com.satgaskeamanan.app.models.RegisterRequest;
@@ -25,6 +26,7 @@ import retrofit2.http.PATCH;
 import retrofit2.http.Part;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface APIService {
 
@@ -49,6 +51,16 @@ public interface APIService {
     // ---------------------------
     @GET("user/profile/")
     Call<UserModel> getUserProfile();
+
+    // NEW: Update Profile (PATCH)
+    @Multipart
+    @PATCH("user/profile/")
+    Call<UserModel> updateProfile(
+            @Part("first_name") RequestBody firstName,
+            @Part("last_name") RequestBody lastName,
+            @Part("phone_number") RequestBody phoneNumber,
+            @Part MultipartBody.Part profilePicture // Opsional
+    );
 
 
     // ---------------------------
@@ -93,7 +105,11 @@ public interface APIService {
             @Body Map<String, String> statusUpdate
     );
 
-    // Endpoint rekap presensi harian (sesuai konfirmasi pengguna)
+    // Endpoint rekap presensi harian
     @GET("admin/laporan/harian/")
-    Call<HarianPresensiReportModel> getHarianPresensiReport();
+    Call<HarianPresensiReportModel> getHarianPresensiReport(@Query("date") String date);
+
+    // NEW: Dashboard Stats
+    @GET("admin/dashboard/stats/")
+    Call<DashboardStatsModel> getDashboardStats();
 }

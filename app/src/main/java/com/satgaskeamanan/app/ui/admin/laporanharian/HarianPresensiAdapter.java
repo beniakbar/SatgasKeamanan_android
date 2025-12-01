@@ -19,10 +19,16 @@ public class HarianPresensiAdapter extends RecyclerView.Adapter<HarianPresensiAd
 
     private final List<PetugasStatusPresensiModel> petugasList;
     private final Context context;
+    private final OnItemClickListener listener;
 
-    public HarianPresensiAdapter(Context context, List<PetugasStatusPresensiModel> petugasList) {
+    public interface OnItemClickListener {
+        void onItemClick(PetugasStatusPresensiModel petugas);
+    }
+
+    public HarianPresensiAdapter(Context context, List<PetugasStatusPresensiModel> petugasList, OnItemClickListener listener) {
         this.context = context;
         this.petugasList = petugasList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -35,29 +41,41 @@ public class HarianPresensiAdapter extends RecyclerView.Adapter<HarianPresensiAd
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         PetugasStatusPresensiModel petugas = petugasList.get(position);
+        AdminPresensiModel presensi = petugas.getLastPresensi();
 
         holder.tvNama.setText(petugas.getFullName());
 
-        if (petugas.isHasPresensiToday()) {
-            // Status Hadir
-            holder.tvStatus.setText(R.string.status_hadir);
-            holder.tvStatus.setTextColor(Color.parseColor("#4CAF50")); // Hijau
-
-            AdminPresensiModel lastPresensi = petugas.getLastPresensi();
-            if (lastPresensi != null) {
-                // Tampilkan waktu presensi terakhir hari ini
-                holder.tvWaktu.setText(context.getString(R.string.presensi_terakhir, lastPresensi.getTimestamp()));
+        // Logika Status Validasi
+        if (petugas.isHasPresensiToday() && presensi != null) {
+            String statusValidasi = presensi.getStatusValidasi();
+            
+            if (statusValidasi == null || "hadir".equalsIgnoreCase(statusValidasi)) {
+                // HADIR (Valid)
+                holder.tvStatus.setText("HADIR");
+                holder.tvStatus.setTextColor(Color.parseColor("#4CAF50")); // Hijau
+            } else if ("diluar_lokasi".equalsIgnoreCase(statusValidasi)) {
+                // DILUAR LOKASI
+                holder.tvStatus.setText("DILUAR LOKASI");
+                holder.tvStatus.setTextColor(Color.parseColor("#FF9800")); // Oranye
             } else {
-                holder.tvWaktu.setText(R.string.presensi_data_tidak_tersedia);
+                // TIDAK HADIR (Dibatalkan/Tidak Valid)
+                holder.tvStatus.setText("TIDAK HADIR (INVALID)");
+                holder.tvStatus.setTextColor(Color.RED);
             }
 
+            holder.tvWaktu.setText("Waktu: " + presensi.getTimestamp());
+            
+            // Tetap bisa diklik untuk lihat detail/validasi
+            holder.itemView.setOnClickListener(v -> listener.onItemClick(petugas));
+            holder.itemView.setClickable(true);
         } else {
-            // Status Tidak Hadir (Absen)
-            holder.tvStatus.setText(R.string.status_absen);
+            // Belum Presensi
+            holder.tvStatus.setText("TIDAK HADIR");
             holder.tvStatus.setTextColor(Color.RED);
-
-            // Tampilkan informasi login terakhir atau kosongkan
-            holder.tvWaktu.setText(R.string.belum_presensi_hari_ini);
+            holder.tvWaktu.setText("Belum melakukan presensi.");
+            
+            holder.itemView.setOnClickListener(null);
+            holder.itemView.setClickable(false);
         }
     }
 
