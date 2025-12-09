@@ -20,6 +20,65 @@
             android:layout_marginBottom="16dp"
             android:textColor="#333333"/>
 
+        <!-- MONITORING ALARM CARD -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_monitoring_alarm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="#D32F2F"
+            app:cardElevation="6dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@android:drawable/ic_lock_idle_alarm"
+                    app:tint="#FFFFFF"
+                    android:layout_marginEnd="16dp"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MONITORING ALARM"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:id="@+id/tv_active_alarm_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cek Status Alarm..."
+                        android:textColor="#FFEBEE"
+                        android:textSize="14sp"/>
+                </LinearLayout>
+                
+                <!-- Menggunakan ic_menu_send yang public dan mirip panah -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_send" 
+                    app:tint="#FFFFFF"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <!-- Bagian Statistik (Kartu Berwarna) -->
         <GridLayout
             android:layout_width="match_parent"

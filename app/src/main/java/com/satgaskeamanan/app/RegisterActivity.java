@@ -25,7 +25,7 @@ import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText etName, etEmail, etPhone, etPassword, etConfirmPassword;
+    private EditText etFirstName, etLastName, etEmail, etPhone, etPassword, etConfirmPassword;
     private Button btnRegister;
     private TextView tvLoginLink;
     private APIService apiService; 
@@ -39,9 +39,10 @@ public class RegisterActivity extends AppCompatActivity {
         apiService = APIClient.getAPIService(this);
 
         // Initialize UI components
-        etName = findViewById(R.id.et_reg_name);
+        etFirstName = findViewById(R.id.et_reg_first_name);
+        etLastName = findViewById(R.id.et_reg_last_name);
         etEmail = findViewById(R.id.et_reg_email);
-        etPhone = findViewById(R.id.et_reg_phone); // Tambahan
+        etPhone = findViewById(R.id.et_reg_phone); 
         etPassword = findViewById(R.id.et_reg_password);
         etConfirmPassword = findViewById(R.id.et_reg_confirm_password);
         btnRegister = findViewById(R.id.btn_register);
@@ -63,15 +64,16 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void performRegistration() {
-        String name = etName.getText().toString().trim();
+        String firstName = etFirstName.getText().toString().trim();
+        String lastName = etLastName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim(); // Tambahan
+        String phone = etPhone.getText().toString().trim(); 
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
         // Basic Validation
-        if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Semua kolom wajib diisi!", Toast.LENGTH_SHORT).show();
+        if (firstName.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Nama Depan, Email, Telepon, dan Password wajib diisi!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -80,8 +82,8 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // Kirim request dengan phone number
-        RegisterRequest registerRequest = new RegisterRequest(name, email, password, phone);
+        // Kirim request dengan model baru (first_name, last_name)
+        RegisterRequest registerRequest = new RegisterRequest(firstName, lastName, email, password, phone);
 
         apiService.register(registerRequest).enqueue(new Callback<RegisterResponse>() {
             @Override
@@ -94,18 +96,15 @@ public class RegisterActivity extends AppCompatActivity {
                     try {
                         if (response.errorBody() != null) {
                             String errorBodyStr = response.errorBody().string();
-                            // Coba parse sebagai JSON jika memungkinkan
                             try {
                                 JSONObject jsonObject = new JSONObject(errorBodyStr);
-                                // Jika format { "error": "msg" }
                                 if (jsonObject.has("error")) {
                                     errorMsg = jsonObject.getString("error");
                                 } else {
-                                    // Jika format lain, tampilkan raw
                                     errorMsg = errorBodyStr; 
                                 }
                             } catch (Exception e) {
-                                errorMsg = errorBodyStr; // Jika bukan JSON valid
+                                errorMsg = errorBodyStr;
                             }
                         }
                     } catch (IOException e) {

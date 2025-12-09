@@ -48,17 +48,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * PresensiActivity — full working version
- *
- * - Permissions: CAMERA & ACCESS_FINE_LOCATION
- * - Location: FusedLocationProviderClient, request updates until first fix then stop
- * - Camera: create file via getExternalFilesDir(), FileProvider for URI
- * - Upload: multipart fields must match backend:
- *      latitude, longitude, location_note, note, selfie_photo
- *
- * Paste this file and ensure manifest/provider and xml/file_paths exist.
- */
 public class PresensiActivity extends AppCompatActivity {
     private static final String TAG = "PresensiActivity";
 
@@ -69,7 +58,7 @@ public class PresensiActivity extends AppCompatActivity {
     private TextView txtLocation;
     private ImageView imgSelfie;
     private EditText etNote;
-    private Button btnAmbilFoto, btnKirim;
+    private Button btnAmbilFoto, btnKirim, btnBack; // Tambahkan btnBack
 
     // Location & Camera
     private FusedLocationProviderClient fusedLocationClient;
@@ -77,13 +66,9 @@ public class PresensiActivity extends AppCompatActivity {
     private LocationRequest locationRequest;
     private Location currentLocation;
 
-    // Photo file path
     private String currentPhotoPath;
-
-    // API
     private APIService apiService;
 
-    // Required permissions
     private final String[] REQUIRED_PERMS = new String[]{
             Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -94,12 +79,15 @@ public class PresensiActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_presensi);
 
+        // Hapus kode Action Bar sebelumnya karena kita pakai tombol manual sekarang
+
         // init UI
         txtLocation = findViewById(R.id.txtLocation);
         imgSelfie = findViewById(R.id.imgSelfie);
         etNote = findViewById(R.id.etNote);
         btnAmbilFoto = findViewById(R.id.btnAmbilFoto);
         btnKirim = findViewById(R.id.btnKirim);
+        btnBack = findViewById(R.id.btn_back_presensi); // Bind ID
 
         // init api & location
         apiService = APIClient.getAPIService(this);
@@ -117,14 +105,16 @@ public class PresensiActivity extends AppCompatActivity {
 
         btnAmbilFoto.setOnClickListener(v -> dispatchTakePictureIntent());
 
+        // Listener Tombol Kembali (Manual)
+        btnBack.setOnClickListener(v -> finish());
+
         btnKirim.setOnClickListener(v -> {
-            // protect against double-click
             btnKirim.setEnabled(false);
             new Handler(Looper.getMainLooper()).postDelayed(() -> btnKirim.setEnabled(true), 1500);
 
             if (currentLocation == null) {
                 Toast.makeText(this, "Lokasi belum siap, tunggu sebentar...", Toast.LENGTH_SHORT).show();
-                startLocationUpdates(); // try again
+                startLocationUpdates();
                 return;
             }
 
@@ -137,7 +127,6 @@ public class PresensiActivity extends AppCompatActivity {
         });
     }
 
-    // ----------------- PERMISSIONS -----------------
     private boolean hasAllPermissions() {
         for (String p : REQUIRED_PERMS) {
             if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
@@ -169,10 +158,8 @@ public class PresensiActivity extends AppCompatActivity {
         }
     }
 
-    // ----------------- LOCATION -----------------
     private void setupLocationRequest() {
         locationRequest = LocationRequest.create();
-        // priority & interval
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(2000); // 2s
         locationRequest.setFastestInterval(1000);
@@ -187,8 +174,6 @@ public class PresensiActivity extends AppCompatActivity {
                 if (currentLocation != null) {
                     txtLocation.setText(String.format(Locale.US, "Lat: %.6f | Lon: %.6f",
                             currentLocation.getLatitude(), currentLocation.getLongitude()));
-
-                    // we got a fix — stop updates to save battery
                     try {
                         fusedLocationClient.removeLocationUpdates(locationCallback);
                     } catch (SecurityException se) {
@@ -203,7 +188,6 @@ public class PresensiActivity extends AppCompatActivity {
         if (!hasAllPermissions()) return;
         try {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-            // Also try to get last known quickly
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener(loc -> {
                         if (loc != null) {
@@ -217,9 +201,7 @@ public class PresensiActivity extends AppCompatActivity {
         }
     }
 
-    // ----------------- CAMERA (FileProvider) -----------------
     private File createImageFile() throws IOException {
-        // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -231,7 +213,6 @@ public class PresensiActivity extends AppCompatActivity {
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) == null) {
             Toast.makeText(this, "Kamera tidak tersedia di perangkat ini.", Toast.LENGTH_SHORT).show();
             return;
@@ -279,7 +260,6 @@ public class PresensiActivity extends AppCompatActivity {
         }
     }
 
-    // ----------------- UPLOAD PRESENSI -----------------
     private void uploadPresensi() {
         if (currentLocation == null) {
             Toast.makeText(this, "Lokasi belum tersedia.", Toast.LENGTH_SHORT).show();
@@ -298,7 +278,6 @@ public class PresensiActivity extends AppCompatActivity {
             return;
         }
 
-        // Prepare request bodies (ensure dot decimal using Locale.US)
         String latStr = String.format(Locale.US, "%.6f", currentLocation.getLatitude());
         String lonStr = String.format(Locale.US, "%.6f", currentLocation.getLongitude());
         String locationNote = "Lokasi otomatis";
@@ -313,42 +292,25 @@ public class PresensiActivity extends AppCompatActivity {
         RequestBody fileRB = RequestBody.create(MediaType.parse("image/jpeg"), photoFile);
         MultipartBody.Part photoPart = MultipartBody.Part.createFormData("selfie_photo", photoFile.getName(), fileRB);
 
-        // Call API
         Call<Void> call = apiService.kirimPresensi(latRB, lonRB, locRB, noteRB, photoPart);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
-                    // Success feedback
                     Toast.makeText(PresensiActivity.this, "Presensi berhasil dikirim!", Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "Presensi upload success: " + response.code());
-
-                    // small delay so user sees toast
                     new Handler(Looper.getMainLooper()).postDelayed(() -> finish(), 900);
                 } else {
-                    // Read server error body if available
-                    String err = "Kode: " + response.code();
-                    try {
-                        if (response.errorBody() != null) {
-                            err = response.errorBody().string();
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, "errorBody read failed: " + e.getMessage());
-                    }
-                    Log.e(TAG, "Presensi upload failed: " + err);
                     Toast.makeText(PresensiActivity.this, "Gagal upload: " + response.code(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Log.e(TAG, "Presensi upload onFailure: " + t.getMessage(), t);
                 Toast.makeText(PresensiActivity.this, "Gagal terhubung: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    // ----------------- cleanup -----------------
     @Override
     protected void onDestroy() {
         super.onDestroy();

@@ -3,8 +3,11 @@ package com.satgaskeamanan.app.models;
 import com.google.gson.annotations.SerializedName;
 
 public class RegisterRequest {
-    @SerializedName("name")
-    private String name;
+    @SerializedName("first_name")
+    private String firstName;
+
+    @SerializedName("last_name")
+    private String lastName;
 
     @SerializedName("email")
     private String email;
@@ -15,8 +18,9 @@ public class RegisterRequest {
     @SerializedName("phone_number")
     private String phoneNumber;
 
-    public RegisterRequest(String name, String email, String password, String phoneNumber) {
-        this.name = name;
+    public RegisterRequest(String firstName, String lastName, String email, String password, String phoneNumber) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;

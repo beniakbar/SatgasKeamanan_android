@@ -83,19 +83,21 @@
                 android:inputType="phone"/>
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Tombol Simpan (Sekarang di atas) -->
         <Button
             android:id="@+id/btn_save_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Simpan Perubahan"/>
+            android:text="Simpan Perubahan"
+            android:layout_marginBottom="16dp"/>
 
+        <!-- Tombol Kembali (Sekarang di bawah Simpan) -->
         <Button
-            android:id="@+id/btn_logout_profile"
+            android:id="@+id/btn_back_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Logout"
-            android:backgroundTint="#F44336"
-            android:layout_marginTop="16dp"/>
+            android:text="Kembali"
+            android:backgroundTint="#757575"/>
 
         <ProgressBar
             android:id="@+id/pb_profile"

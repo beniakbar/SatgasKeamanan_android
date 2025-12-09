@@ -43,7 +43,7 @@ public class LaporanActivity extends AppCompatActivity {
 
     private EditText etTitle, etDescription;
     private ImageView imgPreview;
-    private Button btnAmbilFoto, btnKirim;
+    private Button btnAmbilFoto, btnKirim, btnBack; // Tambahkan btnBack
 
     private String currentPhotoPath;
     private APIService apiService;
@@ -59,12 +59,16 @@ public class LaporanActivity extends AppCompatActivity {
         imgPreview = findViewById(R.id.imgLaporanPreview);
         btnAmbilFoto = findViewById(R.id.btnAmbilFotoLaporan);
         btnKirim = findViewById(R.id.btnKirimLaporan);
+        btnBack = findViewById(R.id.btn_back_laporan); // Bind ID
 
         apiService = APIClient.getAPIService(this);
 
         // Actions
         btnAmbilFoto.setOnClickListener(v -> checkPermissionAndOpenCamera());
         btnKirim.setOnClickListener(v -> uploadLaporan());
+        
+        // Listener Tombol Kembali (Manual)
+        btnBack.setOnClickListener(v -> finish());
     }
 
     // --- CAMERA LOGIC ---
@@ -143,18 +147,13 @@ public class LaporanActivity extends AppCompatActivity {
 
         File file = new File(currentPhotoPath);
 
-        // Prepare RequestBody
         RequestBody titleBody = RequestBody.create(MediaType.parse("text/plain"), title);
         RequestBody descBody = RequestBody.create(MediaType.parse("text/plain"), desc);
-        
-        // Placeholder for coordinates (assuming 0,0 for now or get from LocationService if implemented)
         RequestBody latBody = RequestBody.create(MediaType.parse("text/plain"), "0.0");
         RequestBody longBody = RequestBody.create(MediaType.parse("text/plain"), "0.0");
-
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("photo", file.getName(), requestFile);
 
-        // Call API - Updated with 5 arguments
         apiService.kirimLaporan(latBody, longBody, titleBody, descBody, body).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {

@@ -32,11 +32,11 @@ import retrofit2.Response;
 
 public class AdminDashboardFragment extends Fragment {
 
-    private TextView tvTotalPetugas, tvHadirToday, tvBelumHadir, tvLaporanBaru;
-    private CardView cvTotalPetugas, cvHadirToday, cvBelumHadir, cvLaporanBaru;
+    private TextView tvTotalPetugas, tvHadirToday, tvBelumHadir, tvLaporanBaru, tvActiveAlarmCount;
+    private CardView cvTotalPetugas, cvHadirToday, cvBelumHadir, cvLaporanBaru, cvMonitoringAlarm;
     private RecyclerView rvRecentPresensi, rvOpenLaporan;
     private ProgressBar progressBar;
-    private Button btnRefresh, btnLogout; // Tambahkan btnLogout
+    private Button btnRefresh, btnLogout;
     private APIService apiService;
 
     public AdminDashboardFragment() {
@@ -52,18 +52,20 @@ public class AdminDashboardFragment extends Fragment {
         tvHadirToday = view.findViewById(R.id.tv_hadir_today);
         tvBelumHadir = view.findViewById(R.id.tv_belum_hadir);
         tvLaporanBaru = view.findViewById(R.id.tv_laporan_baru);
+        tvActiveAlarmCount = view.findViewById(R.id.tv_active_alarm_count);
         
         cvTotalPetugas = view.findViewById(R.id.cv_total_petugas);
         cvHadirToday = view.findViewById(R.id.cv_hadir_today);
         cvBelumHadir = view.findViewById(R.id.cv_belum_hadir);
         cvLaporanBaru = view.findViewById(R.id.cv_laporan_baru);
+        cvMonitoringAlarm = view.findViewById(R.id.cv_monitoring_alarm);
         
         rvRecentPresensi = view.findViewById(R.id.rv_recent_presensi);
         rvOpenLaporan = view.findViewById(R.id.rv_open_laporan);
         
         progressBar = view.findViewById(R.id.pb_dashboard);
         btnRefresh = view.findViewById(R.id.btn_refresh_dashboard);
-        btnLogout = view.findViewById(R.id.btn_logout); // Inisialisasi Tombol Logout
+        btnLogout = view.findViewById(R.id.btn_logout);
 
         // Setup RecyclerView
         rvRecentPresensi.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -76,25 +78,32 @@ public class AdminDashboardFragment extends Fragment {
         cvHadirToday.setOnClickListener(v -> navigateTo(new HarianPresensiFragment()));
         cvBelumHadir.setOnClickListener(v -> navigateTo(new HarianPresensiFragment()));
         cvLaporanBaru.setOnClickListener(v -> navigateTo(new LaporanListFragment()));
+        
+        // Listener Monitoring Alarm
+        cvMonitoringAlarm.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), AdminAlarmActivity.class));
+        });
 
         btnRefresh.setOnClickListener(v -> loadDashboardStats());
-        
-        // --- SET LOGOUT LISTENER ---
         btnLogout.setOnClickListener(v -> performLogout());
 
         loadDashboardStats();
     }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadDashboardStats(); // Auto refresh saat kembali dari activity lain
+    }
 
     private void performLogout() {
-        // 1. Hapus Token dari SharedPreferences
         SharedPreferences settings = requireContext().getSharedPreferences(LoginActivity.PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
-        editor.clear(); // Hapus semua data (AccessToken, RefreshToken)
+        editor.clear();
         editor.apply();
 
         Toast.makeText(requireContext(), "Logout Berhasil.", Toast.LENGTH_SHORT).show();
 
-        // 2. Redirect ke LoginActivity dan bersihkan stack activity agar tidak bisa 'Back' ke dashboard
         Intent intent = new Intent(requireContext(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -125,6 +134,9 @@ public class AdminDashboardFragment extends Fragment {
                     tvHadirToday.setText(String.valueOf(stats.getHadirToday()));
                     tvBelumHadir.setText(String.valueOf(stats.getBelumHadir()));
                     tvLaporanBaru.setText(String.valueOf(stats.getLaporanBaru()));
+                    
+                    // Update Alarm Count
+                    tvActiveAlarmCount.setText(stats.getActiveAlarms() + " Alarm Aktif");
                     
                     if (stats.getRecentPresensi() != null) {
                         rvRecentPresensi.setAdapter(new RecentPresensiAdapter(stats.getRecentPresensi()));

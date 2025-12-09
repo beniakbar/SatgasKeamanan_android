@@ -56,4 +56,7 @@ dependencies {
 
     // CircleImageView (Untuk Foto Profil Bulat)
     implementation("de.hdodenhof:circleimageview:3.1.0")
+
+    // SwipeRefreshLayout (Diperlukan untuk fitur Pull-to-Refresh di monitoring alarm)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

@@ -15,6 +15,9 @@ public class DashboardStatsModel {
 
     @SerializedName("laporan_baru")
     private int laporanBaru;
+    
+    @SerializedName("active_alarms") // Field baru
+    private int activeAlarms;
 
     // Data List
     @SerializedName("recent_presensi")
@@ -27,6 +30,7 @@ public class DashboardStatsModel {
     public int getHadirToday() { return hadirToday; }
     public int getBelumHadir() { return belumHadir; }
     public int getLaporanBaru() { return laporanBaru; }
+    public int getActiveAlarms() { return activeAlarms; } // Getter baru
     
     public List<AdminPresensiModel> getRecentPresensi() { return recentPresensi; }
     public List<AdminLaporanModel> getOpenLaporan() { return openLaporan; }

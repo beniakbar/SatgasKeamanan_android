@@ -40,7 +40,7 @@ public class ProfileFragment extends Fragment {
 
     private CircleImageView ivProfilePicture;
     private TextInputEditText etFirstName, etLastName, etEmail, etPhone;
-    private Button btnSave, btnLogout;
+    private Button btnSave, btnBack; // Removed btnLogout
     private ProgressBar progressBar;
     private APIService apiService;
     private Uri selectedImageUri;
@@ -61,7 +61,7 @@ public class ProfileFragment extends Fragment {
         etEmail = view.findViewById(R.id.et_profile_email);
         etPhone = view.findViewById(R.id.et_profile_phone);
         btnSave = view.findViewById(R.id.btn_save_profile);
-        btnLogout = view.findViewById(R.id.btn_logout_profile);
+        btnBack = view.findViewById(R.id.btn_back_profile); 
         progressBar = view.findViewById(R.id.pb_profile);
 
         apiService = APIClient.getAPIService(requireContext());
@@ -70,7 +70,13 @@ public class ProfileFragment extends Fragment {
 
         ivProfilePicture.setOnClickListener(v -> openGallery());
         btnSave.setOnClickListener(v -> updateProfile());
-        btnLogout.setOnClickListener(v -> performLogout());
+        
+        // Listener Tombol Kembali
+        btnBack.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                getActivity().onBackPressed();
+            }
+        });
     }
 
     private void loadUserProfile() {
@@ -190,13 +196,5 @@ public class ProfileFragment extends Fragment {
         outputStream.close();
         inputStream.close();
         return file;
-    }
-
-    private void performLogout() {
-        SharedPreferences settings = requireContext().getSharedPreferences(LoginActivity.PREFS_NAME, Context.MODE_PRIVATE);
-        settings.edit().clear().apply();
-        Intent intent = new Intent(requireContext(), LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
     }
 }

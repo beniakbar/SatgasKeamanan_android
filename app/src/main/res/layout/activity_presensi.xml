@@ -10,6 +10,14 @@
         android:padding="16dp">
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Isi Presensi"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
             android:id="@+id/txtLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,6 +53,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Kirim Presensi"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/btn_back_presensi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kembali"
+            android:backgroundTint="#757575"
             android:layout_marginTop="16dp" />
 
     </LinearLayout>

@@ -9,6 +9,8 @@ import com.satgaskeamanan.app.models.UserModel;
 import com.satgaskeamanan.app.models.LoginRequest;
 import com.satgaskeamanan.app.models.RegisterRequest;
 import com.satgaskeamanan.app.models.RegisterResponse;
+import com.satgaskeamanan.app.models.AlarmRequest;
+import com.satgaskeamanan.app.models.AlarmModel;
 
 import java.util.List;
 import java.util.Map;
@@ -52,14 +54,13 @@ public interface APIService {
     @GET("user/profile/")
     Call<UserModel> getUserProfile();
 
-    // NEW: Update Profile (PATCH)
     @Multipart
     @PATCH("user/profile/")
     Call<UserModel> updateProfile(
             @Part("first_name") RequestBody firstName,
             @Part("last_name") RequestBody lastName,
             @Part("phone_number") RequestBody phoneNumber,
-            @Part MultipartBody.Part profilePicture // Opsional
+            @Part MultipartBody.Part profilePicture 
     );
 
 
@@ -91,8 +92,26 @@ public interface APIService {
     );
 
     // ---------------------------
+    // EMERGENCY ALARM - PETUGAS
+    // ---------------------------
+    @POST("alarm/")
+    Call<Void> triggerAlarm(@Body AlarmRequest request);
+    
+    // Get Active Alarms (Untuk Polling Petugas & Admin)
+    @GET("alarm/")
+    Call<List<AlarmModel>> getActiveAlarms(@Query("status") String status);
+
+    // ---------------------------
     // ADMIN
     // ---------------------------
+    
+    // Update Status Alarm (Mark as Handled)
+    @PATCH("alarm/{id}/")
+    Call<Void> updateAlarmStatus(
+            @Path("id") int alarmId,
+            @Body Map<String, String> statusUpdate
+    );
+
     @GET("admin/petugas/")
     Call<List<PetugasModel>> getDaftarPetugas();
 
@@ -105,11 +124,9 @@ public interface APIService {
             @Body Map<String, String> statusUpdate
     );
 
-    // Endpoint rekap presensi harian
     @GET("admin/laporan/harian/")
     Call<HarianPresensiReportModel> getHarianPresensiReport(@Query("date") String date);
 
-    // NEW: Dashboard Stats
     @GET("admin/dashboard/stats/")
     Call<DashboardStatsModel> getDashboardStats();
 }

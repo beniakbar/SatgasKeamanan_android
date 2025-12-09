@@ -20,15 +20,33 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <!-- Input Name -->
-        <EditText
-            android:id="@+id/et_reg_name"
+        <!-- First & Last Name Row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="Nama Lengkap"
-            android:inputType="textPersonName"
-            android:minHeight="48dp" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_reg_first_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:hint="Nama Depan"
+                android:inputType="textPersonName"
+                android:minHeight="48dp" />
+
+            <EditText
+                android:id="@+id/et_reg_last_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:hint="Nama Belakang"
+                android:inputType="textPersonName"
+                android:minHeight="48dp" />
+        </LinearLayout>
 
         <!-- Input Email -->
         <EditText
@@ -40,7 +58,7 @@
             android:inputType="textEmailAddress"
             android:minHeight="48dp" />
 
-        <!-- Input Phone Number (NEW) -->
+        <!-- Input Phone Number -->
         <EditText
             android:id="@+id/et_reg_phone"
             android:layout_width="match_parent"
